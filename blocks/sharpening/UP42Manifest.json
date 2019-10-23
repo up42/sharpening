@@ -1,0 +1,30 @@
+{
+    "_up42_specification_version": 1,
+    "name": "sharpening",
+    "type": "processing",
+    "tags": [
+        "imagery",
+        "processing",
+        "preprocessing",
+        "filtering",
+        "filter",
+        "sharpening",
+        "sharpen",
+        "highpass"
+    ],
+    "display_name": "Raster Sharpening - Highpass filter",
+    "description": "This block sharpens raster images by applying a high-pass filter.",
+    "parameters": {
+        "strength": {"type": "string", "default": "medium"},
+        "filter_method": {"type": "string", "default": "kernel"}
+    },
+    "machine": {
+	    "type": "large"
+    },
+    "input_capabilities": {
+        "up42.data.aoiclipped": {}
+    },
+    "output_capabilities": {
+        "up42.data.aoiclipped": {}
+    }
+}
