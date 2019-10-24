@@ -1,4 +1,4 @@
-# Custom block example: Sharpening
+# Processing Block Example: Sharpening
 ## Introduction
 
 This repository is intended as an example of how to bring your own custom processing
@@ -104,10 +104,6 @@ make build
 Run the `e2e` tests with:
 
 ```bash
-# WARNING: This test carries out the complete preprocessing chain for a full Sentinel-1 image.
-# This requires sufficient memory and disk capacity settings in your docker setup.
-# Go to Docker > Preferences > Advanced and increase Memory to >8GB and Swap to >2GB.
-# This test will take about 2 hours to complete on a standard machine! Please be patient.
 
 make e2e
 ```
