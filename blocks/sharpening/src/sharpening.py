@@ -121,7 +121,9 @@ class RasterSharpener:
 
                 if self.filter_method == 'kernel':
                     # Windowed read and write, buffered window by 2 pixels to enable correct 3x3 kernel operation.
-                    for window, window_buffered in WindowsUtil(src).windows_buffered(buffer=2):
+                    windows_util = WindowsUtil(src)
+
+                    for window, window_buffered in windows_util.windows_buffered(buffer=2):
 
                         img_array = np.stack(list(src.read(range(1, band_count + 1), window=window_buffered)))
 
@@ -130,7 +132,7 @@ class RasterSharpener:
                         )
 
                         # Crop result to original window
-                        sharpened = WindowsUtil(src).crop_array_to_window(sharpened,
+                        sharpened = windows_util.crop_array_to_window(sharpened,
                                                                           window,
                                                                           window_buffered)
 
