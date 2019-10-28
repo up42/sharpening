@@ -77,8 +77,8 @@ def test_from_dict():
     assert sharpen_mock_dict_complete.strength == "medium"
 
 
-def test_gaussian_filter(test_array_fixture):
-    sharpened = RasterSharpener().gaussian_filter(test_array_fixture)
+def test_gaussian_sharpening(test_array_fixture):
+    sharpened = RasterSharpener().gaussian_sharpening(test_array_fixture)
     assert sharpened.shape == (4, 256, 256)
 
 

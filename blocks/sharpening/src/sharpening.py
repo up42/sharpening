@@ -33,7 +33,7 @@ class RasterSharpener:
         self.filter_method = filter_method
 
     @staticmethod
-    def gaussian_filter(in_array: np.ndarray, alpha: int = 15) -> np.ndarray:
+    def gaussian_sharpening(in_array: np.ndarray, alpha: int = 15) -> np.ndarray:
         """
         This gaussian highpass filter works by sharpening a blurred image, then
         increasing the weight of the edges by adding an approximation of the Laplacian.
@@ -86,7 +86,7 @@ class RasterSharpener:
         elif filter_method == "gaussian":
             sharpened = np.array(
                 [
-                    self.gaussian_filter(band_ar, alpha=alpha)
+                    self.gaussian_sharpening(band_ar, alpha=alpha)
                     for band_ar in in_array.astype(kernel.dtype)
                 ]
             )
