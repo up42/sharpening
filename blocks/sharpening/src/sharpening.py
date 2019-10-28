@@ -90,10 +90,10 @@ class RasterSharpener:
 
             with rio.open(str(output_file_path), "w", **out_profile) as dst:
 
-                # Windowed read and write, buffered window by 2 pixels to enable correct 3x3 kernel operation.
+                # Windowed read and write, buffered window by 4 pixels to enable correct 5x5 kernel operation.
                 windows_util = WindowsUtil(src)
 
-                for window, window_buffered in windows_util.windows_buffered(buffer=2):
+                for window, window_buffered in windows_util.windows_buffered(buffer=4):
 
                     img_array = np.stack(
                         list(src.read(range(1, band_count + 1), window=window_buffered))
@@ -180,7 +180,6 @@ class RasterSharpener:
         """
         This method is the main entry point for this processing block.
         """
-        # pylint: disable=E1121
         ensure_data_directories_exist()
         params: dict = load_params()
         input_metadata: FeatureCollection = load_metadata()

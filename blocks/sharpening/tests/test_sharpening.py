@@ -91,9 +91,9 @@ def test_sharpen_raster(tmp_raster_fixture):
 @pytest.mark.parametrize(
     "strength, expected_mean",
     [
-        ("light", 119.61281204223633),
-        ("medium", 119.52975463867188),
-        ("strong", 120.10889434814453),
+        ("light", 119.61306762695312),
+        ("medium", 119.53784942626953),
+        ("strong", 120.20846176147461),
     ],
 )
 # pylint: disable=unused-argument
