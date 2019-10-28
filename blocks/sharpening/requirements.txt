@@ -3,7 +3,7 @@ scipy==1.2.1
 geojson==2.4.1
 shapely==1.6.4.post2
 rasterio==1.0.21
-scikit-image
+scikit-image==0.16.2
 pytest
 pytest-pylint
 mypy==0.720

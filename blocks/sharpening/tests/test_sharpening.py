@@ -68,18 +68,13 @@ def test_array_fixture():
 
 
 def test_from_dict():
-    mock_dict_complete = {"strength": "strong", "filter_method": "gaussian"}
+    mock_dict_complete = {"strength": "strong"}
     sharpen_mock_dict_complete = RasterSharpener.from_dict(mock_dict_complete)
     assert sharpen_mock_dict_complete.strength == "strong"
 
     mock_dict_empty = {}
     sharpen_mock_dict_complete = RasterSharpener.from_dict(mock_dict_empty)
     assert sharpen_mock_dict_complete.strength == "medium"
-
-
-def test_gaussian_sharpening(test_array_fixture):
-    sharpened = RasterSharpener().gaussian_sharpening(test_array_fixture)
-    assert sharpened.shape == (4, 256, 256)
 
 
 def test_sharpen_array(test_array_fixture):
@@ -94,23 +89,20 @@ def test_sharpen_raster(tmp_raster_fixture):
 
 
 @pytest.mark.parametrize(
-    "filter_method, strength, expected_mean",
+    "strength, expected_mean",
     [
-        ("gaussian", "light", 119.64327621459961),
-        ("gaussian", "medium", 119.64336776733398),
-        ("gaussian", "strong", 119.64334487915039),
-        ("kernel", "light", 200.14871978759766),
-        ("kernel", "medium", 119.71706771850586),
-        ("kernel", "strong", 89.67022705078125),
+        ("light", 119.61281204223633),
+        ("medium", 119.52975463867188),
+        ("strong", 120.10889434814453),
     ],
 )
 # pylint: disable=unused-argument
 def test_raster_sharpening_expected_pixel_values(
-    tmp_raster_fixture, filter_method, strength, expected_mean
+    tmp_raster_fixture, strength, expected_mean
 ):
     in_path, out_path = tmp_raster_fixture
 
-    params_dict = {"strength": strength, "filter_method": filter_method}
+    params_dict = {"strength": strength}
 
     RasterSharpener().from_dict(params_dict).sharpen_raster(in_path, out_path)
     assert out_path.exists()
@@ -175,8 +167,7 @@ def test_run(tmp_raster_fixture):
         "UP42_TASK_PARAMETERS"
     ] = """
     {
-      "strength": "strong",
-      "filter_method": "gaussian"
+      "strength": "light"
     }
     """
 

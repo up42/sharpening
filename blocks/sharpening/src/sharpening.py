@@ -4,7 +4,7 @@ from geojson import FeatureCollection, Feature
 
 import numpy as np
 import rasterio as rio
-from scipy import ndimage
+from skimage.filters import unsharp_mask
 
 from helpers import (
     AOICLIPPED,
@@ -21,76 +21,47 @@ logger = get_logger(__name__)
 
 
 class RasterSharpener:
-    def __init__(self, strength: str = "medium", filter_method: str = "kernel"):
+    def __init__(self, strength: str = "medium"):
         """
         This class implements a high-pass image filtering method to sharpen a raster.
 
         :strength: Strength of the sharpening operation, one of "medium" (default),
             "light", "strong".
-        :filter_method: Used high-pass image filter, "gaussian" (default) or "kernel".
         """
         self.strength = strength
-        self.filter_method = filter_method
 
     @staticmethod
-    def gaussian_sharpening(in_array: np.ndarray, alpha: int = 15) -> np.ndarray:
-        """
-        This gaussian highpass filter works by sharpening a blurred image, then
-        increasing the weight of the edges by adding an approximation of the Laplacian.
-
-        :in_array: Input 2d-array
-        :param alpha: Alpha value to highlight edges
-        :return: Sharpened output 2d-array
-        """
-        blurred = ndimage.gaussian_filter(in_array, sigma=3)
-        filter_blurred = ndimage.gaussian_filter(blurred, sigma=1)
-        noise = blurred - filter_blurred
-        sharpened = in_array - alpha * noise
-        return sharpened
-
-    def sharpen_array(
-        self,
-        in_array: np.ndarray,
-        strength: str = "medium",
-        filter_method: str = "kernel",
-    ) -> np.ndarray:
+    def sharpen_array(in_array: np.ndarray, strength: str = "medium") -> np.ndarray:
         """
         Runs the sharpening operation on the input array, returns a sharpened output
-            array.
+        array.
 
-        :param in_array: Input 3d-array
-        :param strength: Strength of the sharpening operation, one of "medium"
-            (default), "light", "strong".
-        :param filter_method: Used high-pass image filter, "kernel" (default) or
-            "gaussian".
+        In the 'unsharpen' algorithm, the sharp details are identified as the
+        difference between the original image and its blurred version. These details
+        are then scaled, and added back to the original image.
+
+        :strength: Strength of the sharpening operation, one of "medium" (default),
+            "light", "strong".
         :return: Sharpened output 3d-array
         """
         if strength == "light":
-            alpha = 5
-            kernel = np.array([[0, -1 / 8, 0], [-1 / 8, 3, -1 / 8], [0, -1 / 8, 0]])
+            radius, amount = 1, 1
         elif strength == "medium":
-            alpha = 15
-            kernel = np.array([[0, -1 / 4, 0], [-1 / 4, 2, -1 / 4], [0, -1 / 4, 0]])
+            radius, amount = 2, 2
         elif strength == "strong":
-            alpha = 22
-            kernel = np.array([[0, -1 / 4, 0], [-1 / 4, 7 / 4, -1 / 4], [0, -1 / 4, 0]])
+            radius, amount = 3, 3
 
-        if filter_method == "kernel":
-            # TODO: Exclude alpha band from convolution by sensor bands definition / capabilities.
-            sharpened = np.array(
-                [
-                    ndimage.convolve(band_ar, kernel)
-                    for band_ar in in_array.astype(kernel.dtype)
-                ]
-            )
-        elif filter_method == "gaussian":
-            sharpened = np.array(
-                [
-                    self.gaussian_sharpening(band_ar, alpha=alpha)
-                    for band_ar in in_array.astype(kernel.dtype)
-                ]
-            )
-        # Resolve potential array overflow by clipping to min/max values of input datatype.
+        sharpened = unsharp_mask(
+            in_array.transpose((1, 2, 0)),
+            radius=radius,  # size of the gaussian blur and sharpen kernel
+            amount=amount,  # strength of the sharpening
+            preserve_range=True,
+            multichannel=True,
+        )
+        sharpened = sharpened.transpose((2, 0, 1))
+
+        # Resolve potential array overflow by clipping to min/max values of the input
+        # datatype.
         sharpened = np.clip(
             sharpened,
             np.iinfo(in_array.dtype).min,
@@ -119,50 +90,24 @@ class RasterSharpener:
 
             with rio.open(str(output_file_path), "w", **out_profile) as dst:
 
-                if self.filter_method == "kernel":
-                    # Windowed read and write, buffered window by 2 pixels to enable correct 3x3 kernel operation.
-                    windows_util = WindowsUtil(src)
+                # Windowed read and write, buffered window by 2 pixels to enable correct 3x3 kernel operation.
+                windows_util = WindowsUtil(src)
 
-                    for window, window_buffered in windows_util.windows_buffered(
-                        buffer=2
-                    ):
+                for window, window_buffered in windows_util.windows_buffered(buffer=2):
 
-                        img_array = np.stack(
-                            list(
-                                src.read(
-                                    range(1, band_count + 1), window=window_buffered
-                                )
-                            )
-                        )
+                    img_array = np.stack(
+                        list(src.read(range(1, band_count + 1), window=window_buffered))
+                    )
 
-                        sharpened = self.sharpen_array(
-                            img_array,
-                            strength=self.strength,
-                            filter_method=self.filter_method,
-                        )
+                    sharpened = self.sharpen_array(img_array, strength=self.strength)
 
-                        # Crop result to original window
-                        sharpened = windows_util.crop_array_to_window(
-                            sharpened, window, window_buffered
-                        )
-
-                        for i in range(band_count):
-                            dst.write(sharpened[i, ...], i + 1, window=window)
-
-                elif self.filter_method == "gaussian":
-                    # TODO: Gaussian filter is not compatible with windowed read/write
-                    # TODO: (regardless of window buffer size) as
-                    # TODO: ndimage.gaussian_filter apparently uses image normalization.
-                    img_array = np.stack(list(src.read(range(1, band_count + 1))))
-
-                    sharpened = self.sharpen_array(
-                        img_array,
-                        strength=self.strength,
-                        filter_method=self.filter_method,
+                    # Crop result to original window
+                    sharpened = windows_util.crop_array_to_window(
+                        sharpened, window, window_buffered
                     )
 
                     for i in range(band_count):
-                        dst.write(sharpened[i, ...], i + 1)
+                        dst.write(sharpened[i, ...], i + 1, window=window)
 
     def process(self, metadata: FeatureCollection) -> FeatureCollection:
         """
@@ -228,8 +173,7 @@ class RasterSharpener:
         :return: Instance of RasterSharpener class configured with the given parameters
         """
         strength: str = params_dict.get("strength", "medium") or "medium"
-        filter_method: str = params_dict.get("filter_method", "kernel") or "kernel"
-        return RasterSharpener(strength=strength, filter_method=filter_method)
+        return RasterSharpener(strength=strength)
 
     @staticmethod
     def run():
@@ -243,7 +187,6 @@ class RasterSharpener:
         rs = RasterSharpener.from_dict(params)
 
         logger.debug("Using sharpening strenth: %s", rs.strength)
-        logger.debug("Using filter method: %s", rs.filter_method)
 
         result: FeatureCollection = rs.process(input_metadata)
         save_metadata(result)
