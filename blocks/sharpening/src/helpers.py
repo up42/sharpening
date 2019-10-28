@@ -111,7 +111,8 @@ class WindowsUtil:
 
     def windows_buffered(self, buffer: int = 0) -> Iterable[Window]:
         """
-        Method that returns buffered windows with a given int buffer.
+        Method that returns a buffered windows with a given int buffer in each
+        direction, limited to the raster boundaries.
         """
         for _, window in self.windows:
             buffered_window = self.buffer_window(window, buffer)
