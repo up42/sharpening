@@ -14,7 +14,7 @@ from helpers import (
     load_params,
     load_metadata,
     ensure_data_directories_exist,
-    WindowsUtil
+    WindowsUtil,
 )
 
 logger = get_logger(__name__)
@@ -119,34 +119,46 @@ class RasterSharpener:
 
             with rio.open(str(output_file_path), "w", **out_profile) as dst:
 
-                if self.filter_method == 'kernel':
+                if self.filter_method == "kernel":
                     # Windowed read and write, buffered window by 2 pixels to enable correct 3x3 kernel operation.
                     windows_util = WindowsUtil(src)
 
-                    for window, window_buffered in windows_util.windows_buffered(buffer=2):
+                    for window, window_buffered in windows_util.windows_buffered(
+                        buffer=2
+                    ):
 
-                        img_array = np.stack(list(src.read(range(1, band_count + 1), window=window_buffered)))
+                        img_array = np.stack(
+                            list(
+                                src.read(
+                                    range(1, band_count + 1), window=window_buffered
+                                )
+                            )
+                        )
 
                         sharpened = self.sharpen_array(
-                            img_array, strength=self.strength, filter_method=self.filter_method
+                            img_array,
+                            strength=self.strength,
+                            filter_method=self.filter_method,
                         )
 
                         # Crop result to original window
-                        sharpened = windows_util.crop_array_to_window(sharpened,
-                                                                          window,
-                                                                          window_buffered)
+                        sharpened = windows_util.crop_array_to_window(
+                            sharpened, window, window_buffered
+                        )
 
                         for i in range(band_count):
                             dst.write(sharpened[i, ...], i + 1, window=window)
 
-                elif self.filter_method == 'gaussian':
+                elif self.filter_method == "gaussian":
                     # TODO: Gaussian filter is not compatible with windowed read/write
                     # TODO: (regardless of window buffer size) as
                     # TODO: ndimage.gaussian_filter apparently uses image normalization.
                     img_array = np.stack(list(src.read(range(1, band_count + 1))))
 
                     sharpened = self.sharpen_array(
-                        img_array, strength=self.strength, filter_method=self.filter_method
+                        img_array,
+                        strength=self.strength,
+                        filter_method=self.filter_method,
                     )
 
                     for i in range(band_count):

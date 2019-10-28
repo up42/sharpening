@@ -101,6 +101,7 @@ class WindowsUtil:
     Utility class to handle raster IO in windows. Can do regular windows, buffered
     windows and transform windows.
     """
+
     def __init__(self, rio_ds: Union[rio.io.DatasetReader, rio.io.DatasetWriter]):
         """
         Initialize the instance with a rasterio dataset (read or write).
@@ -129,24 +130,24 @@ class WindowsUtil:
         """
         row_slice, col_slice = window.toslices()
 
-        can_row_start = (row_slice.start - buffer)
-        can_row_stop = (row_slice.stop + buffer)
+        can_row_start = row_slice.start - buffer
+        can_row_stop = row_slice.stop + buffer
 
-        can_col_start = (col_slice.start - buffer)
-        can_col_stop = (col_slice.stop + buffer)
+        can_col_start = col_slice.start - buffer
+        can_col_stop = col_slice.stop + buffer
 
         out_row_slice = slice(can_row_start, can_row_stop)
         out_col_slice = slice(can_col_start, can_col_stop)
 
-        buffered_window = Window.from_slices(out_row_slice,
-                                             out_col_slice,
-                                             boundless=True)
+        buffered_window = Window.from_slices(
+            out_row_slice, out_col_slice, boundless=True
+        )
         limited_buffered_window = self.limit_window_to_raster_bounds(buffered_window)
         return limited_buffered_window
 
-    def limit_window_to_raster_bounds(self, window: Window,
-                                      dst_height: int = None,
-                                      dst_width: int = None) -> Window:
+    def limit_window_to_raster_bounds(
+        self, window: Window, dst_height: int = None, dst_width: int = None
+    ) -> Window:
         """
         Make sure the window fits in the dst raster. If not "clips" window to the
         bounds of the raster.
@@ -175,8 +176,9 @@ class WindowsUtil:
 
         return Window.from_slices(result_row, result_col)
 
-    def crop_array_to_window(self, buffered_array: np.array, window: Window,
-                             window_buffer: Window) -> np.array:
+    def crop_array_to_window(
+        self, buffered_array: np.array, window: Window, window_buffer: Window
+    ) -> np.array:
         """
         Crops an array created with the windows_buffered to the extent of
         window. Makes use of the a higher res Affine to "reproject" the original
@@ -189,11 +191,15 @@ class WindowsUtil:
             Buffered window.
         """
         buffer_transform = rio.windows.transform(window_buffer, self.rio_ds.transform)
-        window_transformed = rio.windows.from_bounds(*rio.windows.bounds(window, transform=self.rio_ds.transform),
-                                                     transform=buffer_transform)
+        window_transformed = rio.windows.from_bounds(
+            *rio.windows.bounds(window, transform=self.rio_ds.transform),
+            transform=buffer_transform
+        )
 
         # row, col
-        window_buffer_slices_row, window_buffer_slices_col = window_transformed.toslices()
+        window_buffer_slices_row, window_buffer_slices_col = (
+            window_transformed.toslices()
+        )
 
         slice_col_start = int(round(window_buffer_slices_col.start))
         slice_row_start = int(round(window_buffer_slices_row.start))
@@ -201,5 +207,7 @@ class WindowsUtil:
         slice_col_stop = int(round(window_buffer_slices_col.stop))
         slice_row_stop = int(round(window_buffer_slices_row.stop))
 
-        cropped_array = buffered_array[:, slice_row_start:slice_row_stop, slice_col_start:slice_col_stop]
+        cropped_array = buffered_array[
+            :, slice_row_start:slice_row_stop, slice_col_start:slice_col_stop
+        ]
         return cropped_array
