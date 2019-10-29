@@ -185,7 +185,7 @@ class RasterSharpener:
         input_metadata: FeatureCollection = load_metadata()
         rs = RasterSharpener.from_dict(params)
 
-        logger.debug("Using sharpening strenth: %s", rs.strength)
+        logger.debug("Using sharpening strength: %s", rs.strength)
 
         result: FeatureCollection = rs.process(input_metadata)
         save_metadata(result)
