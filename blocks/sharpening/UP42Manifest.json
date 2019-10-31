@@ -12,7 +12,7 @@
         "sharpen",
         "highpass"
     ],
-    "display_name": "Raster Sharpening",
+    "display_name": "Sharpening Filter",
     "description": "This block enhances the sharpness of a raster image by applying an unsharp mask filter algorithm.",
     "parameters": {
         "strength": {"type": "string", "default": "medium"}
