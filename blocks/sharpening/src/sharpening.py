@@ -136,7 +136,7 @@ class RasterSharpener:
                 out_feature_dir.stem + "_sharpened.tif"
             )
             out_feature_dir.parent.mkdir(parents=True, exist_ok=True)
-            out_feature_name = str(Path(*out_feature_dir.parts[-2:]))
+            out_feature_name = in_feature_name.replace(".tif", "_sharpened.tif")
             logger.debug("Output file: %s", out_feature_name)
 
             self.sharpen_raster(in_feature_path, out_feature_dir)
