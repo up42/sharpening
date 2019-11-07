@@ -11,7 +11,8 @@ from rasterio.windows import Window
 import numpy as np
 
 
-AOICLIPPED = "up42.data.aoiclipped"
+IN_CAPABILITY = "up42.data.aoiclipped"
+OUT_CAPABILITY = "up42.data.aoiclipped"
 
 LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
