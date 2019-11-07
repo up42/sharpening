@@ -11,7 +11,7 @@ import numpy as np
 
 from context import RasterSharpener
 
-from context import AOICLIPPED, ensure_data_directories_exist, setup_test_directories
+from context import ensure_data_directories_exist, setup_test_directories
 
 
 @pytest.fixture(scope="session", autouse=True)
