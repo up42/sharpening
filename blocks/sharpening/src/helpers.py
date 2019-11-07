@@ -1,9 +1,9 @@
 import os
 import json
-import pathlib
+from pathlib import Path
 import shutil
 import logging
-from typing import Any, Iterable, Union
+from typing import Any, Iterable, Union, Tuple
 
 from geojson import Feature, FeatureCollection
 import rasterio as rio
@@ -35,12 +35,12 @@ def set_capability(feature: Feature, capability: str, value: Any) -> Feature:
 
 
 def ensure_data_directories_exist():
-    pathlib.Path("/tmp/input/").mkdir(parents=True, exist_ok=True)
-    pathlib.Path("/tmp/output/").mkdir(parents=True, exist_ok=True)
-    pathlib.Path("/tmp/quicklooks/").mkdir(parents=True, exist_ok=True)
+    Path("/tmp/input/").mkdir(parents=True, exist_ok=True)
+    Path("/tmp/output/").mkdir(parents=True, exist_ok=True)
+    Path("/tmp/quicklooks/").mkdir(parents=True, exist_ok=True)
 
 
-def setup_test_directories(test_dir: pathlib.Path):
+def setup_test_directories(test_dir: Path):
     """
     Creates given test directory (usually /tmp or /tmp/e2e_test) and empty input/output/quicklook subfolders.
     """
@@ -49,11 +49,11 @@ def setup_test_directories(test_dir: pathlib.Path):
     for folder in ["input", "output", "quicklooks"]:
         try:
             shutil.rmtree(test_dir / folder)
-            pathlib.Path(test_dir / folder).mkdir(parents=True, exist_ok=True)
+            Path(test_dir / folder).mkdir(parents=True, exist_ok=True)
         # Deleting subfolder sometimes does not work in temp, then remove all subfiles.
         except (PermissionError, OSError):
-            pathlib.Path(test_dir / folder).mkdir(parents=True, exist_ok=True)
-            files_to_delete = pathlib.Path(test_dir / folder).rglob("*.*")
+            Path(test_dir / folder).mkdir(parents=True, exist_ok=True)
+            files_to_delete = Path(test_dir / folder).rglob("*.*")
             for file_path in files_to_delete:
                 file_path.unlink()
 
