@@ -58,6 +58,45 @@ def setup_test_directories(test_dir: Path):
                 file_path.unlink()
 
 
+def get_in_out_feature_names_and_paths(
+    in_feature: Feature, in_capability: str, postfix: str = ""
+) -> Tuple[str, str, Path, Path]:
+    """
+    Utility to generate the input and output feature names and file paths. Will create
+    parent directory(ies) of output file by default. Optionally augments the output filename
+    with a postfix.
+
+    Parameters
+    ----------
+    in_feature : A Feature of a GeoJSON FeatureCollection describing all input datasets
+    postfix : (Optional) Additional string to add to the end of the file name before
+        the file suffix. Adds "_" plus postfix.
+
+    Returns
+    -------
+        Tuple with str of in- & output feature names and in- & output file paths.
+    """
+    in_feature_name = in_feature["properties"][in_capability]
+    in_feature_path = Path("/tmp/input") / in_feature_name
+
+    if postfix == "":
+        out_feature_name = in_feature_name
+    else:
+        in_feature_name = Path(in_feature_name)
+        out_feature_name = in_feature_name.with_name(
+            in_feature_name.stem + "_" + postfix + in_feature_name.suffix
+        )
+    out_feature_path = Path("/tmp/output") / out_feature_name
+    out_feature_path.parent.mkdir(parents=True, exist_ok=True)
+
+    return (
+        str(in_feature_name),
+        str(out_feature_name),
+        in_feature_path,
+        out_feature_path,
+    )
+
+
 def load_params() -> dict:
     """
     Get the parameters for the current task directly from the task parameters.
