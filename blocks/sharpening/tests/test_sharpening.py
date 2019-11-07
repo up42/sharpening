@@ -122,17 +122,15 @@ def test_process(tmp_raster_fixture):
     Checks the raster processing for multiple images.
     """
     in_path, _ = tmp_raster_fixture
-
     img_file_list = [in_path]
 
     feature_list: List[Feature] = []
-
     for img_path in img_file_list:
         bbox = [2.5, 1.0, 4.0, 5.0]
         geom = box(*bbox)
 
         in_properties = {
-            AOICLIPPED: str(Path(*img_path.parts[-2:])),
+            "up42.data.aoiclipped": str(Path(*img_path.parts[-2:])),
             "acquisitionDate": "2018-10-16T10:39:43.431Z",
         }
         feature_list.append(Feature(geometry=geom, bbox=bbox, properties=in_properties))
@@ -145,7 +143,7 @@ def test_process(tmp_raster_fixture):
 
     for feature in output_fc.features:
         # Check that file paths in metadata are relative
-        feature_file = feature["properties"][AOICLIPPED]
+        feature_file = feature["properties"]["up42.data.aoiclipped"]
         assert Path(feature_file).root == ""
         # Check that metadata is propagated
         assert feature["properties"]["acquisitionDate"] == "2018-10-16T10:39:43.431Z"

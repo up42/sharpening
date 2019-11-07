@@ -90,7 +90,8 @@ class RasterSharpener:
 
             with rio.open(str(output_file_path), "w", **out_profile) as dst:
 
-                # Windowed read and write, buffered window by 4 pixels to enable correct 5x5 kernel operation.
+                # Windowed read and write, buffered window by 4 pixels to enable correct
+                # 5x5 kernel operation.
                 windows_util = WindowsUtil(src)
 
                 for window, window_buffered in windows_util.windows_buffered(buffer=4):
