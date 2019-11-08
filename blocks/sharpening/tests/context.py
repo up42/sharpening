@@ -9,8 +9,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../s
 # pylint: disable=unused-import,wrong-import-position
 from src.sharpening import RasterSharpener
 from src.helpers import (
-    IN_CAPABILITY,
-    OUT_CAPABILITY,
     ensure_data_directories_exist,
     setup_test_directories,
     get_logger,
