@@ -69,6 +69,7 @@ def get_in_out_feature_names_and_paths(
     Parameters
     ----------
     in_feature : A Feature of a GeoJSON FeatureCollection describing all input datasets
+    in_capability: Input capability key.
     postfix : (Optional) Additional string to add to the end of the file name before
         the file suffix. Adds "_" plus postfix.
 
