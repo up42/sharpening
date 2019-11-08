@@ -7,13 +7,15 @@ import rasterio as rio
 from skimage.filters import unsharp_mask
 
 from helpers import (
-    AOICLIPPED,
-    set_capability,
+    IN_CAPABILITY,
+    OUT_CAPABILITY,
     get_logger,
+    ensure_data_directories_exist,
+    get_in_out_feature_names_and_paths,
+    set_capability,
     save_metadata,
     load_params,
     load_metadata,
-    ensure_data_directories_exist,
     WindowsUtil,
 )
 
@@ -90,7 +92,8 @@ class RasterSharpener:
 
             with rio.open(str(output_file_path), "w", **out_profile) as dst:
 
-                # Windowed read and write, buffered window by 4 pixels to enable correct 5x5 kernel operation.
+                # Windowed read and write, buffered window by 4 pixels to enable correct
+                # 5x5 kernel operation.
                 windows_util = WindowsUtil(src)
 
                 for window, window_buffered in windows_util.windows_buffered(buffer=4):
@@ -120,33 +123,26 @@ class RasterSharpener:
         """
         logger.debug("Sharpening started...")
 
+        ensure_data_directories_exist()
+
         results: List[Feature] = []
         for in_feature in metadata.features:
-            process_dir = Path("/tmp")
-            input_dir = process_dir / "input"
-            out_dir = process_dir / "output"
-            ensure_data_directories_exist()
-
-            in_feature_name = in_feature["properties"][AOICLIPPED]
-            in_feature_path = input_dir / in_feature_name
-            logger.debug("Input file: %s", str(in_feature_name))
-
-            out_feature_dir = Path(out_dir / in_feature_name)
-            out_feature_dir = out_feature_dir.with_name(
-                out_feature_dir.stem + "_sharpened.tif"
+            in_feature_name, out_feature_name, in_feature_path, out_feature_path = get_in_out_feature_names_and_paths(
+                in_feature, IN_CAPABILITY
             )
-            out_feature_dir.parent.mkdir(parents=True, exist_ok=True)
-            out_feature_name = str(Path(*out_feature_dir.parts[-2:]))
+
+            logger.debug("Input file: %s", in_feature_name)
             logger.debug("Output file: %s", out_feature_name)
 
-            self.sharpen_raster(in_feature_path, out_feature_dir)
+            self.sharpen_raster(in_feature_path, out_feature_path)
 
             out_feature = Feature(
                 geometry=in_feature["geometry"], bbox=in_feature["bbox"]
             )
             out_feature["properties"] = self.get_metadata(in_feature)
-            set_capability(out_feature, AOICLIPPED, out_feature_name)
+            set_capability(out_feature, OUT_CAPABILITY, out_feature_name)
             results.append(out_feature)
+
             logger.debug("File %s was sharpened.", out_feature_name)
 
         return FeatureCollection(results)

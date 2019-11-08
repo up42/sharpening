@@ -1,9 +1,9 @@
 import os
 import json
-import pathlib
+from pathlib import Path
 import shutil
 import logging
-from typing import Any, Iterable, Union
+from typing import Any, Iterable, Union, Tuple
 
 from geojson import Feature, FeatureCollection
 import rasterio as rio
@@ -11,7 +11,8 @@ from rasterio.windows import Window
 import numpy as np
 
 
-AOICLIPPED = "up42.data.aoiclipped"
+IN_CAPABILITY = "up42.data.aoiclipped"
+OUT_CAPABILITY = "up42.data.aoiclipped"
 
 LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
@@ -34,12 +35,12 @@ def set_capability(feature: Feature, capability: str, value: Any) -> Feature:
 
 
 def ensure_data_directories_exist():
-    pathlib.Path("/tmp/input/").mkdir(parents=True, exist_ok=True)
-    pathlib.Path("/tmp/output/").mkdir(parents=True, exist_ok=True)
-    pathlib.Path("/tmp/quicklooks/").mkdir(parents=True, exist_ok=True)
+    Path("/tmp/input/").mkdir(parents=True, exist_ok=True)
+    Path("/tmp/output/").mkdir(parents=True, exist_ok=True)
+    Path("/tmp/quicklooks/").mkdir(parents=True, exist_ok=True)
 
 
-def setup_test_directories(test_dir: pathlib.Path):
+def setup_test_directories(test_dir: Path):
     """
     Creates given test directory (usually /tmp or /tmp/e2e_test) and empty input/output/quicklook subfolders.
     """
@@ -48,13 +49,53 @@ def setup_test_directories(test_dir: pathlib.Path):
     for folder in ["input", "output", "quicklooks"]:
         try:
             shutil.rmtree(test_dir / folder)
-            pathlib.Path(test_dir / folder).mkdir(parents=True, exist_ok=True)
+            Path(test_dir / folder).mkdir(parents=True, exist_ok=True)
         # Deleting subfolder sometimes does not work in temp, then remove all subfiles.
         except (PermissionError, OSError):
-            pathlib.Path(test_dir / folder).mkdir(parents=True, exist_ok=True)
-            files_to_delete = pathlib.Path(test_dir / folder).rglob("*.*")
+            Path(test_dir / folder).mkdir(parents=True, exist_ok=True)
+            files_to_delete = Path(test_dir / folder).rglob("*.*")
             for file_path in files_to_delete:
                 file_path.unlink()
+
+
+def get_in_out_feature_names_and_paths(
+    in_feature: Feature, in_capability: str, postfix: str = ""
+) -> Tuple[str, str, Path, Path]:
+    """
+    Utility to generate the input and output feature names and file paths. Will create
+    parent directory(ies) of output file by default. Optionally augments the output filename
+    with a postfix.
+
+    Parameters
+    ----------
+    in_feature : A Feature of a GeoJSON FeatureCollection describing all input datasets
+    in_capability: Input capability key.
+    postfix : (Optional) Additional string to add to the end of the file name before
+        the file suffix. Adds "_" plus postfix.
+
+    Returns
+    -------
+        Tuple with str of in- & output feature names and in- & output file paths.
+    """
+    in_feature_name = in_feature["properties"][in_capability]
+    in_feature_path = Path("/tmp/input") / in_feature_name
+
+    if postfix == "":
+        out_feature_name = in_feature_name
+    else:
+        in_feature_name = Path(in_feature_name)
+        out_feature_name = in_feature_name.with_name(
+            in_feature_name.stem + "_" + postfix + in_feature_name.suffix
+        )
+    out_feature_path = Path("/tmp/output") / out_feature_name
+    out_feature_path.parent.mkdir(parents=True, exist_ok=True)
+
+    return (
+        str(in_feature_name),
+        str(out_feature_name),
+        in_feature_path,
+        out_feature_path,
+    )
 
 
 def load_params() -> dict:
