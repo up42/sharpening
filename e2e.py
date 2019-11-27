@@ -23,7 +23,7 @@ if __name__ == "__main__":
     setup_test_directories(TEST_DIR)
 
     os.system(
-        "gsutil cp -r gs://blocks-e2e-testing/e2e_sharpening/sentinel2_rgb/input/ %s"
+        "gsutil cp -r gs://floss-blocks-e2e-testing/e2e_sharpening/sentinel2_rgb/input/ %s"
         % TEST_DIR
     )
 
