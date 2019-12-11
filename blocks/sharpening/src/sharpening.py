@@ -71,12 +71,7 @@ class RasterSharpener:
             dtype_min = np.finfo(in_array.dtype).min
             dtype_max = np.finfo(in_array.dtype).max
 
-        sharpened = np.clip(
-            sharpened,
-            dtype_min,
-            dtype_max,
-            out=sharpened,
-        )
+        sharpened = np.clip(sharpened, dtype_min, dtype_max, out=sharpened)
         sharpened = sharpened.astype(in_array.dtype)
 
         return sharpened
