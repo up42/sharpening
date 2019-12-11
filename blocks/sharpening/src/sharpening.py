@@ -64,12 +64,14 @@ class RasterSharpener:
 
         # Resolve potential array overflow by clipping to min/max values of the input
         # datatype.
-        sharpened = np.clip(
-            sharpened,
-            np.iinfo(in_array.dtype).min,
-            np.iinfo(in_array.dtype).max,
-            out=sharpened,
-        )
+        if np.issubdtype(in_array.dtype, np.integer):
+            dtype_min = np.iinfo(in_array.dtype).min
+            dtype_max = np.iinfo(in_array.dtype).max
+        elif np.issubdtype(in_array.dtype, np.floating):
+            dtype_min = np.finfo(in_array.dtype).min
+            dtype_max = np.finfo(in_array.dtype).max
+
+        sharpened = np.clip(sharpened, dtype_min, dtype_max, out=sharpened)
         sharpened = sharpened.astype(in_array.dtype)
 
         return sharpened
