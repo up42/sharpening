@@ -239,9 +239,10 @@ class WindowsUtil:
         )
 
         # row, col
-        window_buffer_slices_row, window_buffer_slices_col = (
-            window_transformed.toslices()
-        )
+        (
+            window_buffer_slices_row,
+            window_buffer_slices_col,
+        ) = window_transformed.toslices()
 
         slice_col_start = int(round(window_buffer_slices_col.start))
         slice_row_start = int(round(window_buffer_slices_row.start))
