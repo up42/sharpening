@@ -165,8 +165,6 @@ make push UID=<UID> DOCKER_TAG=<docker tag> DOCKER_VERSION=<docker version>
 # As an example: make push UID=63uayd50-z2h1-3461-38zq-1739481rjwia DOCKER_TAG=sharpening DOCKER_VERSION=1.0
 ```
 
+## Questions and recommendations
 
-## Support
-
-Open a **github issue** in this repository or send us an **email** at [support@up42.com](mailto:support@up42.com),
-we are happy to answer your questions!
+Open a **github issue** in this repository; we are happy to answer your questions!
