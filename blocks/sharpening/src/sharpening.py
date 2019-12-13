@@ -129,9 +129,12 @@ class RasterSharpener:
 
         results: List[Feature] = []
         for in_feature in metadata.features:
-            in_feature_name, out_feature_name, in_feature_path, out_feature_path = get_in_out_feature_names_and_paths(
-                in_feature, IN_CAPABILITY
-            )
+            (
+                in_feature_name,
+                out_feature_name,
+                in_feature_path,
+                out_feature_path,
+            ) = get_in_out_feature_names_and_paths(in_feature, IN_CAPABILITY)
 
             logger.debug("Input file: %s", in_feature_name)
             logger.debug("Output file: %s", out_feature_name)
