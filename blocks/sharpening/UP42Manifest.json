@@ -1,5 +1,5 @@
 {
-    "_up42_specification_version": 1,
+    "_up42_specification_version": 2,
     "name": "sharpening",
     "type": "processing",
     "tags": [
@@ -21,9 +21,22 @@
 	    "type": "large"
     },
     "input_capabilities": {
-        "up42.data.aoiclipped": {}
+        "raster": {
+            "up42_standard": {
+                "format": "GTiff"
+            }
+        }
     },
     "output_capabilities": {
-        "up42.data.aoiclipped": {}
+        "raster": {
+            "up42_standard": {
+                "format": "GTiff",
+                "bands": ">",
+                "sensor": ">",
+                "resolution": ">",
+                "dtype": ">",
+                "processing_level": ">"
+            }
+        }
     }
 }
