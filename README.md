@@ -96,6 +96,8 @@ make validate
 
 In order to run the final end-to-end (`e2e`) test the block code needs to be dockerized (put in a container that later on
 would be uploaded to UP42). The end-to-end test makes sure the block's output actually conforms to the platform's requirements.
+To run the e2e tests it is necessary to have gsutil installed which is part of the
+[Google Cloud SDK](https://cloud.google.com/sdk/docs).
 
 First build the docker image locally.
 
