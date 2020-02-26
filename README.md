@@ -1,29 +1,27 @@
 # Processing Block Example: Sharpening
 ![coverage](coverage.svg)
 
-### Introduction
+## Upload your first custom block to UP42
 
 This repository is an example on how to bring your own algorithm to the [UP42 platform](https://up42.com) 
-as a **custom processing block** that can be seamlessly integrated into UP42 workflows.
- 
-The instructions guide you through setting up, dockerizing and pushing your block to UP42.
-The block will appear in the [UP42 custom-blocks menu](https://console.up42.com/custom-blocks). It can then be used like any other data or processing block.
+as a **custom processing block**. It can be seamlessly integrated into UP42 workflows. It will appear 
+in the [UP42 custom-blocks menu](https://console.up42.com/custom-blocks) and can then be used like any 
+other data or processing block.
+
+These instructions give you step-by-step instructions on how to prepare and upload a custom block to UP42. 
+The code example in this repository is an **Image Sharpening** algorithm for GeoTiff files. More details on 
+its functionality in the [Sharpening block documentation](https://docs.up42.com/up42-blocks/processing/sharpening.html).
 
 <p align="center">
-  <img width="500" src="https://i.ibb.co/XsTsFHv/custom-block-menu-sharpening.png">
+  <img width="700" src="https://i.ibb.co/XsTsFHv/custom-block-menu-sharpening.png">
 </p>
 
-The example code implements an **Image Sharpening** block for GeoTiff files. More details on the block functionality in the 
-[Sharpening block documentation](https://docs.up42.com/up42-blocks/processing/sharpening.html).
 
+## Requirements
 
-### Requirements
-
-This example requires the **Mac OS X or Linux bash**, [git](https://git-scm.com/), 
+Uploading a custom block to UP42 requires the **Mac OS X or Linux bash**, [git](https://git-scm.com/), 
 [Docker engine](https://docs.docker.com/engine/) and [GNU make](https://www.gnu.org/software/make/). 
-
-In order to also edit or test the block code locally, 
-[Python 3.7](https://python.org/downloads) and a virtual environment manager 
+If you also want to test or edit the algorithm code locally, [Python 3.7](https://python.org/downloads) and a virtual environment manager 
 e.g. [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/) are required.
 
 
@@ -37,14 +35,13 @@ cd sharpening
 ```
 
 We will skip changing the example code here and directly push the block to the UP42 platform.
-See chapter [Custom Blocks Advanced](https://docs.up42.com/going-further/custom-processing-block-dev.html)
-in the UP42 Documentation for more advanced instructions on developing, testing, updating and publishing 
-a custom block.
+See the UP42 documentation chapter [Custom Blocks - Advanced](https://docs.up42.com/going-further/custom-processing-block-dev.html)
+for detailed instructions on developing, testing, uploading and updating a custom block.
 
 
 ### Authenticate with the UP42 Docker registry
 
-First login to the UP42 docker registry. Replace **<USER-NAME>** with the **email address** you login with on the UP42 website.
+First login to the UP42 docker registry. Replace USERNAME with the **email address** you login with on the UP42 website.
 Make sure Docker is running on your computer. When asked for your password, enter your UP42 account password.
 
 ```bash
@@ -55,7 +52,7 @@ docker login -u=hans.schmidt@up42.com http://registry.up42.com
 ```
 
 
-###Build the block container
+### Build the block container
 
 Then build the block container, replace **<USER-ID>** with your **UP42 User-ID**.
 
@@ -86,11 +83,11 @@ docker push registry.up42.com/6760d08e-54e3-4f1c-b22e-6ba605ec7592/sharpening:1.
 When building a workflow it can be selected under the *Custom blocks* tab.
 
 <p align="center">
-  <img width="500" src="https://i.ibb.co/S6zQRHy/custom-block-workflow.png">
+  <img width="700" src="https://i.ibb.co/S6zQRHy/custom-block-workflow.png">
 </p>
 
 
-### Support, questions and suggestions
+## Support, questions and suggestions
 
 Open a **github issue** in this repository or reach out via [Email](mailto:support@up42.com), 
 we are happy to answer your questions!
