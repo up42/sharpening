@@ -1,174 +1,96 @@
 # Processing Block Example: Sharpening
 ![coverage](coverage.svg)
 
-## Introduction
+### Introduction
 
-This repository is intended as an example of how to bring your own custom processing
-[block](https://docs.up42.com/going-further/core-concepts.html#blocks) to the [UP42 platform](https://up42.com).
-Instructions on how to set up, dockerize and push your block to UP42 are provided below or in the
-[UP42 documentation: Push your first custom block](https://docs.up42.com/getting-started/first-custom-block.html#).
+This repository is an example on how to bring your own algorithm to the [UP42 platform](https://up42.com) 
+as a **custom processing block** that can be seamlessly integrated into UP42 workflows.
+ 
+The instructions guide you through setting up, dockerizing and pushing your block to UP42.
+The block will appear in the [UP42 custom-blocks menu](https://console.up42.com/custom-blocks). It can then be used like any other data or processing block.
 
-The repository contains the code implementing a processing block that performs image sharpening. The block functionality
-and performed processing steps are described in more detail in
-the [UP42 documentation: Image Sharpening](https://docs.up42.com/up42-blocks/processing/sharpening.html).
+<p align="center">
+  <img width="500" src="https://i.ibb.co/XsTsFHv/custom-block-menu-sharpening.png">
+</p>
 
-Block **Input** & **Output**: [GeoTIFF](https://en.wikipedia.org/wiki/GeoTIFF) file
-
-
-## Requirements
-
-This example requires the **Mac or Ubuntu bash**, an example using **Windows** will be provided shortly.
-In order to bring this example block or your own custom block to the UP42 platform the following tools are required:
+The example code implements an **Image Sharpening** block for GeoTiff files. More details on the block functionality in the 
+[Sharpening block documentation](https://docs.up42.com/up42-blocks/processing/sharpening.html).
 
 
- - [UP42](https://up42.com) account -  Sign up for free!
- - [Python 3.7](https://python.org/downloads)
- - A virtual environment manager e.g. [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/)
- - [git](https://git-scm.com/)
- - [docker engine](https://docs.docker.com/engine/)
- - [GNU make](https://www.gnu.org/software/make/)
+### Requirements
+
+This example requires the **Mac OS X or Linux bash**, [git](https://git-scm.com/), 
+[Docker engine](https://docs.docker.com/engine/) and [GNU make](https://www.gnu.org/software/make/). 
+
+In order to also edit or test the block code locally, 
+[Python 3.7](https://python.org/downloads) and a virtual environment manager 
+e.g. [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/) are required.
 
 
-## Instructions
+### Download the example block
 
-The following step-by-step instructions will guide you through setting up, dockerizing and pushing the example custom
-block to UP42.
-
-### Clone the repository
+Clone the example block using git and navigate to the folder that contains the Dockerfile and UP42Manifest:
 
 ```bash
 git clone https://github.com/up42/sharpening.git
+cd sharpening
 ```
 
-Then navigate to the folder via `cd sharpening`.
+We will skip changing the example code here and directly push the block to the UP42 platform.
+See chapter [Custom Blocks Advanced](https://docs.up42.com/going-further/custom-processing-block-dev.html)
+in the UP42 Documentation for more advanced instructions on developing, testing, updating and publishing 
+a custom block.
 
-### Installing the required libraries
 
-First create a new virtual environment called `up42-sharpening`, for example by using
-[virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/):
+### Authenticate with the UP42 Docker registry
+
+First login to the UP42 docker registry. Replace **<USER-NAME>** with the **email address** you login with on the UP42 website.
+Make sure Docker is running on your computer. When asked for your password, enter your UP42 account password.
 
 ```bash
-mkvirtualenv --python=$(which python3.7) up42-sharpening
+docker login -u=<USER-NAME> http://registry.up42.com
+
+# Example:
+docker login -u=hans.schmidt@up42.com http://registry.up42.com
 ```
 
-Activate the new environment:
+
+###Build the block container
+
+Then build the block container, replace **<USER-ID>** with your **UP42 User-ID**.
+
+To get your **UP42 User-ID**, go to the the [UP42 custom-blocks menu](https://console.up42.com/custom-blocks) and click on
+`PUSH A BLOCK TO THE PLATFORM`. At the bottom of the popup, copy your user ID from the
+command `Push the image to the UP42 Docker registry` (e.g. ``6760d08e-54e3-4f1c-b22e-6ba605ec7592``).
 
 ```bash
-workon up42-sharpening
+docker build . -t registry.up42.com/<USER-ID>/sharpening:1.0 --build-arg manifest="$(cat UP42Manifest.json)"
+
+# Example:
+docker build . -t registry.up42.com/6760d08e-54e3-4f1c-b22e-6ba605ec7592/sharpening:1.0 --build-arg manifest="$(cat UP42Manifest.json)"
 ```
 
-Install the necessary Python libraries via:
+
+### Push the custom block to UP42
+
+Now you can push the image to the UP42 docker registry. Again replace **<USER-ID>** with your **UP42 User-ID**.
 
 ```bash
-make install
+docker push registry.up42.com/<USER-ID>/sharpening:1.0
+
+# Example:
+docker push registry.up42.com/6760d08e-54e3-4f1c-b22e-6ba605ec7592/sharpening:1.0
 ```
 
-## Testing the block locally
-
-Before uploading the block to the UP42 platform, we encourage you to run the following local tests and validations to
-ensure that the block works as expected, conforms to the UP42 specifications and could be successfully applied in a
-UP42 workflow.
-
-### Run the unit tests
-
-By successfully running the implemented Python unit tests you can ensure that the block processing functionality works
-as expected. This project uses [pytest](https://docs.pytest.org/en/latest/) for testing, which was installed in
-the previous step. Run the unit tests via:
-
-```bash
-make test
-```
-
-### Validate the manifest
-
-Then test if the block manifest is valid. The
-[UP42manifest.json](https://github.com/up42/sharpening/blob/master/blocks/sharpening/UP42Manifest.json)
-file contains the block capabilities. They define what kind of data a block accepts and provides, which parameters
-can be used with the block etc. See the
-[UP42 block capabilities documentation](https://docs.up42.com/reference/capabilities.html?highlight=capabilities).
-Validate the manifest via:
-
-```bash
-make validate
-```
-
-### Run the end-to-end test
-
-In order to run the final end-to-end (`e2e`) test the block code needs to be dockerized (put in a container that later on
-would be uploaded to UP42). The end-to-end test makes sure the block's output actually conforms to the platform's requirements.
-To run the e2e tests it is necessary to have gsutil installed which is part of the
-[Google Cloud SDK](https://cloud.google.com/sdk/docs).
-
-First build the docker image locally.
-
-```bash
-make build
-```
-
-Run the `e2e` tests with:
-
-```bash
-
-make e2e
-```
-
-
-## Pushing the block to the UP42 platform
-
-First login to the UP42 docker registry. `me@example.com` needs to be replaced by your **UP42 username**,
-which is the email address you use on the UP42 website.
-
-```bash
-make login USER=me@example.com
-```
-
-In order to push the block to the UP42 platform, you need to build the block Docker container with your
-**UP42 USER-ID**. To get your USER-ID, go to the [UP42 custom-blocks menu](https://console.up42.com/custom-blocks).
-Click on "`PUSH a BLOCK to THE PLATFORM`" and copy your USERID from the command shown on the last line at
-"`Push the image to the UP42 Docker registry`". The USERID will look similar to this:
-`63uayd50-z2h1-3461-38zq-1739481rjwia`
-
-Pass the USER-ID to the build command:
-```bash
-make build UID=<UID>
-
-# As an example: make build UID=63uayd50-z2h1-3461-38zq-1739481rjwia
-```
-
-Now you can finally push the image to the UP42 docker registry, again passing in your USER-ID:
-
-```bash
-make push UID=<UID>
-
-# As an example: make push UID=63uayd50-z2h1-3461-38zq-1739481rjwia
-```
-
-**Success!** The block will now appear in the [UP42 custom blocks menu](https://console.up42.com/custom-blocks/) menu
-and can be selected under the *Custom blocks* tab when building a workflow.
+**Success!** The Sharpening Filter example block will now appear in the [UP42 custom-blocks menu](https://console.up42.com/custom-blocks>).
+When building a workflow it can be selected under the *Custom blocks* tab.
 
 <p align="center">
-  <img width="500" src="https://i.ibb.co/YpmwxY2/custom-block-successfully-uploaded.png">
+  <img width="500" src="https://i.ibb.co/S6zQRHy/custom-block-workflow.png">
 </p>
 
-### Optional: Updating an existing custom block
 
-If you want to update a custom block on UP42, you need to build the Docker container with an updated version:
-The default docker tag is `sharpening` and the version is set to `latest`.
+### Support, questions and suggestions
 
-```bash
-make build UID=<UID> DOCKER_TAG=<docker tag> DOCKER_VERSION=<docker version>
-
-# As an example: docker build UID=63uayd50-z2h1-3461-38zq-1739481rjwia DOCKER_TAG=sharpening DOCKER_VERSION=1.0
-```
-
-Then push the block container with the updated tag and version:
-
-```bash
-make push UID=<UID> DOCKER_TAG=<docker tag> DOCKER_VERSION=<docker version>
-
-# As an example: make push UID=63uayd50-z2h1-3461-38zq-1739481rjwia DOCKER_TAG=sharpening DOCKER_VERSION=1.0
-```
-
-## Support, questions and suggestions
-
-Open a **github issue** in this repository; we are happy to answer your questions!
+Open a **github issue** in this repository or reach out via [Email](mailto:support@up42.com), 
+we are happy to answer your questions!
