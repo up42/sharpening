@@ -1,4 +1,6 @@
 # Processing Block Example: Sharpening
+![coverage](coverage.svg)
+
 ## Introduction
 
 This repository is intended as an example of how to bring your own custom processing
@@ -6,7 +8,7 @@ This repository is intended as an example of how to bring your own custom proces
 Instructions on how to set up, dockerize and push your block to UP42 are provided below or in the
 [UP42 documentation: Push your first custom block](https://docs.up42.com/getting-started/first-custom-block.html#).
 
-The repository contains the code implementing a processing block that performs image sharpening. The block functionality 
+The repository contains the code implementing a processing block that performs image sharpening. The block functionality
 and performed processing steps are described in more detail in
 the [UP42 documentation: Image Sharpening](https://docs.up42.com/up42-blocks/processing/sharpening.html).
 
@@ -94,6 +96,8 @@ make validate
 
 In order to run the final end-to-end (`e2e`) test the block code needs to be dockerized (put in a container that later on
 would be uploaded to UP42). The end-to-end test makes sure the block's output actually conforms to the platform's requirements.
+To run the e2e tests it is necessary to have gsutil installed which is part of the
+[Google Cloud SDK](https://cloud.google.com/sdk/docs).
 
 First build the docker image locally.
 

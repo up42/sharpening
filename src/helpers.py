@@ -13,6 +13,7 @@ import numpy as np
 
 IN_CAPABILITY = "up42.data.aoiclipped"
 OUT_CAPABILITY = "up42.data.aoiclipped"
+UP42_DATA_PATH = "up42.data_path"
 
 LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
@@ -77,7 +78,10 @@ def get_in_out_feature_names_and_paths(
     -------
         Tuple with str of in- & output feature names and in- & output file paths.
     """
-    in_feature_name = in_feature["properties"][in_capability]
+    if not UP42_DATA_PATH in in_feature["properties"]:
+        in_feature_name = in_feature["properties"][in_capability]
+    else:
+        in_feature_name = in_feature["properties"][UP42_DATA_PATH]
     in_feature_path = Path("/tmp/input") / in_feature_name
 
     if postfix == "":

@@ -9,6 +9,7 @@ from skimage.filters import unsharp_mask
 from helpers import (
     IN_CAPABILITY,
     OUT_CAPABILITY,
+    UP42_DATA_PATH,
     get_logger,
     ensure_data_directories_exist,
     get_in_out_feature_names_and_paths,
@@ -146,6 +147,7 @@ class RasterSharpener:
             )
             out_feature["properties"] = self.get_metadata(in_feature)
             set_capability(out_feature, OUT_CAPABILITY, out_feature_name)
+            set_capability(out_feature, UP42_DATA_PATH, out_feature_name)
             results.append(out_feature)
 
             logger.debug("File %s was sharpened.", out_feature_name)

@@ -1,0 +1,14 @@
+numpy
+scipy
+geojson
+shapely
+rasterio
+scikit-image
+pytest
+pytest-pylint
+mypy
+mypy-extensions
+pytest-cov
+pytest-mypy
+black
+coverage-badge
