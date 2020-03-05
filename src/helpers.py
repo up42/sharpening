@@ -11,10 +11,6 @@ from rasterio.windows import Window
 import numpy as np
 
 
-IN_CAPABILITY = "up42.data.aoiclipped"
-OUT_CAPABILITY = "up42.data.aoiclipped"
-UP42_DATA_PATH = "up42.data_path"
-
 LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
 
@@ -30,8 +26,8 @@ def get_logger(name, level=logging.DEBUG):
     return logger
 
 
-def set_capability(feature: Feature, capability: str, value: Any) -> Feature:
-    feature["properties"][capability] = value
+def set_data_path(feature: Feature, value: Any) -> Feature:
+    feature["properties"]["up42.data_path"] = value
     return feature
 
 
@@ -60,7 +56,7 @@ def setup_test_directories(test_dir: Path):
 
 
 def get_in_out_feature_names_and_paths(
-    in_feature: Feature, in_capability: str, postfix: str = ""
+    in_feature: Feature, postfix: str = ""
 ) -> Tuple[str, str, Path, Path]:
     """
     Utility to generate the input and output feature names and file paths. Will create
@@ -70,7 +66,6 @@ def get_in_out_feature_names_and_paths(
     Parameters
     ----------
     in_feature : A Feature of a GeoJSON FeatureCollection describing all input datasets
-    in_capability: Input capability key.
     postfix : (Optional) Additional string to add to the end of the file name before
         the file suffix. Adds "_" plus postfix.
 
@@ -78,10 +73,7 @@ def get_in_out_feature_names_and_paths(
     -------
         Tuple with str of in- & output feature names and in- & output file paths.
     """
-    if not UP42_DATA_PATH in in_feature["properties"]:
-        in_feature_name = in_feature["properties"][in_capability]
-    else:
-        in_feature_name = in_feature["properties"][UP42_DATA_PATH]
+    in_feature_name = in_feature["properties"]["up42.data_path"]
     in_feature_path = Path("/tmp/input") / in_feature_name
 
     if postfix == "":

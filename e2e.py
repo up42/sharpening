@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
     # Check number of files in output_prefix
     OUTPUT_SHARPEN = OUTPUT_DIR / Path(
-        FEATURE_COLLECTION.features[0].properties["up42.data.aoiclipped"]
+        FEATURE_COLLECTION.features[0].properties["up42.data_path"]
     )
 
     print(OUTPUT_SHARPEN)
