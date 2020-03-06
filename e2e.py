@@ -10,7 +10,7 @@ import sys
 import geojson
 
 sys.path.insert(
-    0, os.path.abspath(os.path.join(os.path.dirname(__file__), "blocks/sharpening/src"))
+    0, os.path.abspath(os.path.join(os.path.dirname(__file__), "src"))
 )
 from helpers import setup_test_directories  # pylint: disable=wrong-import-position
 
@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
     # Check number of files in output_prefix
     OUTPUT_SHARPEN = OUTPUT_DIR / Path(
-        FEATURE_COLLECTION.features[0].properties["up42.data.aoiclipped"]
+        FEATURE_COLLECTION.features[0].properties["up42.data_path"]
     )
 
     print(OUTPUT_SHARPEN)

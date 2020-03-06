@@ -130,7 +130,7 @@ def test_process(tmp_raster_fixture):
         geom = box(*bbox)
 
         in_properties = {
-            "up42.data.aoiclipped": str(Path(*img_path.parts[-2:])),
+            "up42.data_path": str(Path(*img_path.parts[-2:])),
             "acquisitionDate": "2018-10-16T10:39:43.431Z",
         }
         feature_list.append(Feature(geometry=geom, bbox=bbox, properties=in_properties))
@@ -143,7 +143,7 @@ def test_process(tmp_raster_fixture):
 
     for feature in output_fc.features:
         # Check that file paths in metadata are relative
-        feature_file = feature["properties"]["up42.data.aoiclipped"]
+        feature_file = feature["properties"]["up42.data_path"]
         assert feature["properties"]["up42.data_path"]
         assert Path(feature_file).root == ""
         # Check that metadata is propagated
@@ -181,7 +181,7 @@ def test_process_data_path(tmp_raster_fixture):
 
     for feature in output_fc.features:
         # Check that file paths in metadata are relative
-        feature_file = feature["properties"]["up42.data.aoiclipped"]
+        feature_file = feature["properties"]["up42.data_path"]
         assert feature["properties"]["up42.data_path"]
         assert Path(feature_file).root == ""
         # Check that metadata is propagated
