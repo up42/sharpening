@@ -38,9 +38,8 @@ block to UP42.
 
 ```bash
 git clone https://github.com/up42/sharpening.git
+cd sharpening
 ```
-
-Then navigate to the folder via `cd sharpening`.
 
 ### Installing the required libraries
 
@@ -115,11 +114,14 @@ make e2e
 
 ## Pushing the block to the UP42 platform
 
-First login to the UP42 docker registry. `me@example.com` needs to be replaced by your **UP42 username**,
+First login to the UP42 docker registry. `<USERNAME>` needs to be replaced by your **UP42 username**,
 which is the email address you use on the UP42 website.
 
 ```bash
-make login USER=me@example.com
+docker login -u=<USERNAME> http://registry.up42.com
+
+# Example:
+docker login -u=hans.schmidt@up42.com http://registry.up42.com
 ```
 
 In order to push the block to the UP42 platform, you need to build the block Docker container with your
@@ -128,19 +130,21 @@ Click on "`PUSH a BLOCK to THE PLATFORM`" and copy your USERID from the command 
 "`Push the image to the UP42 Docker registry`". The USERID will look similar to this:
 `63uayd50-z2h1-3461-38zq-1739481rjwia`
 
-Pass the USER-ID to the build command:
+Replace <User-ID> with your UP42 User-ID.
 ```bash
-make build UID=<UID>
+docker build . -t registry.up42.com/<USER-ID>/sharpening:1.0 --build-arg manifest="$(cat UP42Manifest.json)"
 
-# As an example: make build UID=63uayd50-z2h1-3461-38zq-1739481rjwia
+# Example:
+docker build . -t registry.up42.com/6760d08e-54e3-4f1c-b22e-6ba605ec7592/sharpening:1.0 --build-arg manifest="$(cat UP42Manifest.json)"
 ```
 
-Now you can finally push the image to the UP42 docker registry, again passing in your USER-ID:
+Now you can finally push the image to the UP42 docker registry. Replace <User-ID> with your UP42 User-ID.
 
 ```bash
-make push UID=<UID>
+docker push registry.up42.com/<USER-ID>/sharpening:1.0
 
-# As an example: make push UID=63uayd50-z2h1-3461-38zq-1739481rjwia
+# Example:
+docker push registry.up42.com/6760d08e-54e3-4f1c-b22e-6ba605ec7592/sharpening:1.0
 ```
 
 **Success!** The block will now appear in the [UP42 custom blocks menu](https://console.up42.com/custom-blocks/) menu
@@ -152,22 +156,8 @@ and can be selected under the *Custom blocks* tab when building a workflow.
 
 ### Optional: Updating an existing custom block
 
-If you want to update a custom block on UP42, you need to build the Docker container with an updated version:
-The default docker tag is `sharpening` and the version is set to `latest`.
-
-```bash
-make build UID=<UID> DOCKER_TAG=<docker tag> DOCKER_VERSION=<docker version>
-
-# As an example: docker build UID=63uayd50-z2h1-3461-38zq-1739481rjwia DOCKER_TAG=sharpening DOCKER_VERSION=1.0
-```
-
-Then push the block container with the updated tag and version:
-
-```bash
-make push UID=<UID> DOCKER_TAG=<docker tag> DOCKER_VERSION=<docker version>
-
-# As an example: make push UID=63uayd50-z2h1-3461-38zq-1739481rjwia DOCKER_TAG=sharpening DOCKER_VERSION=1.0
-```
+If you want to update a custom block on UP42, you need to build & push the Docker container with
+a higher version number.
 
 ## Support, questions and suggestions
 
