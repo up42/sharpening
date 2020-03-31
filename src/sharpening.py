@@ -172,6 +172,10 @@ class RasterSharpener:
         :return: Instance of RasterSharpener class configured with the given parameters
         """
         strength: str = params_dict.get("strength", "medium") or "medium"
+        if not isinstance(strength, str):
+            raise ValueError(
+                f"Wrong paramter type: {type(strength)} while was expecting str. Passed param: {strength}"
+            )
         return RasterSharpener(strength=strength)
 
     @staticmethod

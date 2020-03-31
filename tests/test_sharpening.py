@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from unittest import mock
 from typing import List
 import shutil
 
@@ -65,6 +66,23 @@ def test_array_fixture():
         img_array = np.stack(list(src.read(range(1, band_count + 1))))
 
     return img_array
+
+
+@pytest.fixture()
+def small_image():
+    test_dir = Path("/tmp")
+    input_dir = test_dir / "input"
+    setup_test_directories(test_dir)
+
+    _location_ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    mock_input_dir = os.path.join(_location_, "mock_data/small_image/")
+    shutil.rmtree(input_dir)
+    shutil.copytree(mock_input_dir, input_dir)
+
+    in_path = Path("/tmp/input/2622dbb9-2b2c-49cd-805d-717265d011ea.tif")
+    out_path = Path(str(in_path).replace("input", "output"))
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    return in_path, out_path
 
 
 def test_from_dict():
@@ -193,6 +211,9 @@ def test_process_data_path(tmp_raster_fixture):
         feature_path.unlink()
 
 
+@mock.patch.dict(
+    "os.environ", {"UP42_TASK_PARAMETERS": '{"strength": "light"}'},
+)
 def test_run(tmp_raster_fixture):
     """
     Checks the raster processing for multiple images.
@@ -211,3 +232,17 @@ def test_run(tmp_raster_fixture):
     RasterSharpener().run()
 
     assert out_path.exists()
+
+
+# pylint: disable=unused-argument
+@mock.patch.dict(
+    "os.environ",
+    {"UP42_TASK_PARAMETERS": '{"strength": {"type": "string", "default": "medium"}'},
+)
+def test_run_wrong_params(small_image):
+    """
+    Checks what happens when a wrong param type is passed,
+    """
+
+    with pytest.raises(ValueError):
+        RasterSharpener().run()
