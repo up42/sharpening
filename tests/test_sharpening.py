@@ -235,17 +235,3 @@ def test_run(tmp_raster_fixture):
     RasterSharpener().run()
 
     assert out_path.exists()
-
-
-# pylint: disable=unused-argument
-@mock.patch.dict(
-    "os.environ",
-    {"UP42_TASK_PARAMETERS": '{"strength": {"type": "string", "default": "medium"}'},
-)
-def test_run_wrong_params(small_image):
-    """
-    Checks what happens when a wrong param type is passed,
-    """
-
-    with pytest.raises(ValueError):
-        RasterSharpener().run()
