@@ -9,8 +9,11 @@ import sys
 
 import geojson
 
+from blockutils.common import (
+    setup_test_directories,
+)  # pylint: disable=wrong-import-position
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
-from helpers import setup_test_directories  # pylint: disable=wrong-import-position
 
 
 if __name__ == "__main__":
