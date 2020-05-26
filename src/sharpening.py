@@ -1,4 +1,4 @@
-from typing import List, Dict, Union
+from typing import List, Union
 from pathlib import Path
 from geojson import FeatureCollection, Feature
 
@@ -6,21 +6,20 @@ import numpy as np
 import rasterio as rio
 from skimage.filters import unsharp_mask
 
-from helpers import (
-    get_logger,
-    ensure_data_directories_exist,
-    get_in_out_feature_names_and_paths,
-    set_data_path,
-    save_metadata,
-    load_params,
-    load_metadata,
-    WindowsUtil,
-)
+from blockutils.logging import get_logger
+
+from blockutils.common import ensure_data_directories_exist
+
+from blockutils.datapath import set_data_path, get_in_out_feature_names_and_paths
+from blockutils.windows import WindowsUtil
+
+from blockutils.blocks import ProcessingBlock
+
 
 logger = get_logger(__name__)
 
 
-class RasterSharpener:
+class RasterSharpener(ProcessingBlock):
     def __init__(self, strength: str = "medium"):
         """
         This class implements a high-pass image filtering method to sharpen a raster.
@@ -28,6 +27,7 @@ class RasterSharpener:
         :strength: Strength of the sharpening operation, one of "medium" (default),
             "light", "strong".
         """
+        super().__init__()
         self.strength = strength
 
     @staticmethod
@@ -112,7 +112,7 @@ class RasterSharpener:
                     for i in range(band_count):
                         dst.write(sharpened[i, ...], i + 1, window=window)
 
-    def process(self, metadata: FeatureCollection) -> FeatureCollection:
+    def process(self, input_fc: FeatureCollection) -> FeatureCollection:
         """
         Given the necessary parameters and a feature collection describing the input
         datasets, runs raster sharpening on each input dataset and creates an output
@@ -121,12 +121,12 @@ class RasterSharpener:
         :param metadata: A GeoJSON FeatureCollection describing all input datasets
         :return: A GeoJSON FeatureCollection describing all output datasets
         """
-        logger.debug("Sharpening started...")
+        logger.debug("Using sharpening strength: %s", self.strength)
 
         ensure_data_directories_exist()
 
         results: List[Feature] = []
-        for in_feature in metadata.features:
+        for in_feature in input_fc.features:
             (
                 in_feature_name,
                 out_feature_name,
@@ -147,7 +147,7 @@ class RasterSharpener:
             results.append(out_feature)
 
             logger.debug("File %s was sharpened.", out_feature_name)
-
+        logger.debug("DONE!")
         return FeatureCollection(results)
 
     @classmethod
@@ -164,34 +164,35 @@ class RasterSharpener:
         return meta_dict
 
     @classmethod
-    def from_dict(cls, params_dict: Dict):
+    def from_dict(cls, kwargs):
         """
         Reads the parameters of the processing block from a provided dictionary.
 
         :param params_dict: The parameters of the sharpening operation
         :return: Instance of RasterSharpener class configured with the given parameters
         """
-        strength: str = params_dict.get("strength", "medium") or "medium"
+
+        strength: str = kwargs.get("strength", "medium") or "medium"
         if not isinstance(strength, str):
             raise ValueError(
-                f"Wrong paramter type: {type(strength)} while was expecting str. Passed param: {strength}"
+                f"Wrong parameter type: {type(strength)} while was expecting str. Passed param: {strength}"
             )
         return RasterSharpener(strength=strength)
 
-    @staticmethod
-    def run():
-        """
-        This method is the main entry point for this processing block.
-        """
-        ensure_data_directories_exist()
-        params: dict = load_params()
-        input_metadata: FeatureCollection = load_metadata()
-        rs = RasterSharpener.from_dict(params)
-
-        logger.debug("Using sharpening strength: %s", rs.strength)
-
-        result: FeatureCollection = rs.process(input_metadata)
-        save_metadata(result)
-
-        logger.debug("Result is %r", result)
-        logger.debug("DONE!")
+    # @staticmethod
+    # def run():
+    #     """
+    #     This method is the main entry point for this processing block.
+    #     """
+    #     ensure_data_directories_exist()
+    #     params: dict = load_params()
+    #     input_metadata: FeatureCollection = load_metadata()
+    #     rs = RasterSharpener.from_dict(params)
+    #
+    #     logger.debug("Using sharpening strength: %s", rs.strength)
+    #
+    #     result: FeatureCollection = rs.process(input_metadata)
+    #     save_metadata(result)
+    #
+    #     logger.debug("Result is %r", result)
+    #     logger.debug("DONE!")
