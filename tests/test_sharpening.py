@@ -10,9 +10,12 @@ from geojson import FeatureCollection, Feature
 import rasterio as rio
 import numpy as np
 
-from context import RasterSharpener
+from blockutils.common import (
+    ensure_data_directories_exist,
+    setup_test_directories,
+)
 
-from context import ensure_data_directories_exist, setup_test_directories
+from context import RasterSharpener
 
 
 @pytest.fixture(scope="session", autouse=True)
