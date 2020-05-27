@@ -179,20 +179,3 @@ class RasterSharpener(ProcessingBlock):
             )
         return RasterSharpener(strength=strength)
 
-    # @staticmethod
-    # def run():
-    #     """
-    #     This method is the main entry point for this processing block.
-    #     """
-    #     ensure_data_directories_exist()
-    #     params: dict = load_params()
-    #     input_metadata: FeatureCollection = load_metadata()
-    #     rs = RasterSharpener.from_dict(params)
-    #
-    #     logger.debug("Using sharpening strength: %s", rs.strength)
-    #
-    #     result: FeatureCollection = rs.process(input_metadata)
-    #     save_metadata(result)
-    #
-    #     logger.debug("Result is %r", result)
-    #     logger.debug("DONE!")
