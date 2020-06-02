@@ -235,3 +235,8 @@ def test_run(tmp_raster_fixture):
     RasterSharpener().run()
 
     assert out_path.exists()
+
+# def test_alpha_band_ignored():
+#     TODO: recognize datasets with alpha_band (if else statement)
+#     apply sharpening
+#     check if alpha band still the same (numpy.equal)

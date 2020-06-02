@@ -101,14 +101,15 @@ class RasterSharpener(ProcessingBlock):
                     img_array = np.stack(
                         list(src.read(range(1, band_count + 1), window=window_buffered))
                     )
-
+                    # TODO: Check if image contains alpha band
+                    # TODO: Ignore alpha band in images that contain alpha band (if else statement)
                     sharpened = self.sharpen_array(img_array, strength=self.strength)
 
                     # Crop result to original window
                     sharpened = windows_util.crop_array_to_window(
                         sharpened, window, window_buffered
                     )
-
+                    # TODO: Add alpha band back to sharpened image (if else statement)
                     for i in range(band_count):
                         dst.write(sharpened[i, ...], i + 1, window=window)
 
