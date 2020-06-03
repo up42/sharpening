@@ -113,6 +113,53 @@ class RasterSharpener(ProcessingBlock):
                     for i in range(band_count):
                         dst.write(sharpened[i, ...], i + 1, window=window)
 
+    # def sharpen_raster(
+    #     self, input_file_path: Union[str, Path], output_file_path: Union[str, Path]
+    # ) -> None:
+    #     """
+    #     Reads the input geotiff raster file, runs the sharpening operation on the array
+    #     and writes the sharpened array back to the output geotiff raster.
+    #
+    #     :param input_file_path: The location of the input file on the file system
+    #     :param output_file_path: The location of the output file on the file system
+    #     """
+    #
+    #     with rio.open(str(input_file_path), "r") as src:
+    #         logger.info("src.meta: %s", src.meta)
+    #         out_profile = src.profile.copy()
+    #         band_count = src.meta["count"]
+    #
+    #         with rio.open(str(output_file_path), "w", **out_profile) as dst:
+    #
+    #             # Windowed read and write, buffered window by 4 pixels to enable correct
+    #             # 5x5 kernel operation.
+    #             windows_util = WindowsUtil(src)
+    #
+    #             for window, window_buffered in windows_util.windows_buffered(buffer=4):
+    #
+    #                 img_array = np.stack(
+    #                     list(src.read(range(1, band_count + 1), window=window_buffered))
+    #                 )
+    #                 # TODO: Check if image contains alpha band
+    #                 # TODO: Ignore alpha band in images that contain alpha band (if else statement) [x]
+    #                 if alpha_band:
+    #                     # exclude last band
+    #                     sharpened = self.sharpen_array(img_array[:-1], strength=self.strength)
+    #                 else:
+    #                     sharpened = self.sharpen_array(img_array, strength=self.strength)
+    #
+    #                 # Crop result to original window
+    #                 sharpened = windows_util.crop_array_to_window(
+    #                     sharpened, window, window_buffered
+    #                 )
+    #                 # TODO: Add alpha band back to sharpened image (if else statement)
+    #                 for i in range(band_count):
+    #                     if alpha_band and i == band_count -1:
+    #                         dst.write(sharpened[i, ...], i + 1, window=window)
+    #                         np.stack(sharpened, img_array[-1])
+    #                     else:
+    #                         dst.write(sharpened[i, ...], i + 1, window=window)
+
     def process(self, input_fc: FeatureCollection) -> FeatureCollection:
         """
         Given the necessary parameters and a feature collection describing the input
@@ -179,4 +226,3 @@ class RasterSharpener(ProcessingBlock):
                 f"Wrong parameter type: {type(strength)} while was expecting str. Passed param: {strength}"
             )
         return RasterSharpener(strength=strength)
-
