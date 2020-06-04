@@ -102,7 +102,7 @@ class RasterSharpener(ProcessingBlock):
                         list(src.read(range(1, band_count + 1), window=window_buffered))
                     )
 
-                    alpha_band = np.all((img_array[-1] == 255)+(img_array[-1] == 0))
+                    alpha_band = np.all((img_array[-1] == 255) + (img_array[-1] == 0))
 
                     # TODO: Check if image contains alpha band
                     # TODO: Ignore alpha band in images that contain alpha band (if else statement) [x]

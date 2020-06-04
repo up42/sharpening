@@ -155,8 +155,7 @@ def test_alpha_band_ignored(tmp_raster_fixture, test_array_fixture):
 
         sharpened = src.read()
 
-    for i in range(band_count):
-        assert np.testing.assert_array_equal(img_array[-1], sharpened[-1])
+        assert np.array_equal(img_array[-1], sharpened[-1])
 
 
 def test_process(tmp_raster_fixture):
