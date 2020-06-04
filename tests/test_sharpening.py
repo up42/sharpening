@@ -138,35 +138,25 @@ def test_raster_sharpening_expected_pixel_values(
         assert img_array.mean() == expected_mean
 
 
-# pylint: disable=unused-argument
-def test_alpha_band_ignored(test_array_fixture, tmp_raster_fixture):
+def test_alpha_band_ignored(tmp_raster_fixture, test_array_fixture):
     """
     Checks if alpha band has changed.
     """
-    # extract mock data
-    _location_ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-    mock_input_path = os.path.join(
-        _location_,
-        "mock_data/sentinel2_rgb/input/3037abae-"
-        "a132-4f7a-b506-fd6e2a0b4492/3a59da06-"
-        "271d-45b2-9f3f-95038227af47.tif",
-    )
+    in_path, out_path = tmp_raster_fixture
+    params_dict = {"strength": "medium"}
+    img_array = test_array_fixture
+    RasterSharpener().from_dict(params_dict).sharpen_raster(in_path, out_path)
 
-    with rio.open(str(mock_input_path), "r") as src:
+    assert out_path.exists()
+
+    with rio.open(str(out_path), "r") as src:
         band_count = src.meta["count"]
         assert band_count == 4
 
-        img_array = test_array_fixture
-        sharpened = RasterSharpener().sharpen_array(test_array_fixture)
+        sharpened = src.read()
 
     for i in range(band_count):
-        assert np.equal(img_array[-1], sharpened[-1])
-
-
-#     TODO: recognize datasets with alpha_band (if else statement)
-#     apply sharpening
-#     check if alpha band still the same (numpy.equal)
-#     assert numpy.equals()
+        assert np.testing.assert_array_equal(img_array[-1], sharpened[-1])
 
 
 def test_process(tmp_raster_fixture):
