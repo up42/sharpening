@@ -106,7 +106,6 @@ class RasterSharpener(ProcessingBlock):
                     alpha_band = np.all((img_array[-1] == 255) + (img_array[-1] == 0))
 
                     if alpha_band:
-                        # exclude last band
                         sharpened = self.sharpen_array(
                             img_array[:-1], strength=self.strength
                         )
