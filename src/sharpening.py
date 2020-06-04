@@ -123,7 +123,6 @@ class RasterSharpener(ProcessingBlock):
                     for i in range(band_count):
                         if alpha_band and i == band_count - 1:
                             dst.write(img_array[i, ...], i + 1, window=window)
-                            # why do i need to stack after this. think it should be before
                         else:
                             dst.write(sharpened[i, ...], i + 1, window=window)
 
