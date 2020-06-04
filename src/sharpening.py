@@ -79,7 +79,8 @@ class RasterSharpener(ProcessingBlock):
     ) -> None:
         """
         Reads the input geotiff raster file, runs the sharpening operation on the array
-        and writes the sharpened array back to the output geotiff raster.
+        and writes the sharpened array back to the output geotiff raster. If geotiff
+        contains alpha band It will be excluded during the sharpening process.
 
         :param input_file_path: The location of the input file on the file system
         :param output_file_path: The location of the output file on the file system
@@ -104,8 +105,6 @@ class RasterSharpener(ProcessingBlock):
 
                     alpha_band = np.all((img_array[-1] == 255) + (img_array[-1] == 0))
 
-                    # TODO: Check if image contains alpha band
-                    # TODO: Ignore alpha band in images that contain alpha band (if else statement) [x]
                     if alpha_band:
                         # exclude last band
                         sharpened = self.sharpen_array(
@@ -120,7 +119,7 @@ class RasterSharpener(ProcessingBlock):
                     sharpened = windows_util.crop_array_to_window(
                         sharpened, window, window_buffered
                     )
-                    # TODO: Add alpha band back to sharpened image (if else statement)
+
                     for i in range(band_count):
                         if alpha_band and i == band_count - 1:
                             dst.write(img_array[i, ...], i + 1, window=window)
