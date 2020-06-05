@@ -79,7 +79,8 @@ class RasterSharpener(ProcessingBlock):
     ) -> None:
         """
         Reads the input geotiff raster file, runs the sharpening operation on the array
-        and writes the sharpened array back to the output geotiff raster.
+        and writes the sharpened array back to the output geotiff raster. If geotiff
+        contains alpha band It will be excluded during the sharpening process.
 
         :param input_file_path: The location of the input file on the file system
         :param output_file_path: The location of the output file on the file system
@@ -102,7 +103,18 @@ class RasterSharpener(ProcessingBlock):
                         list(src.read(range(1, band_count + 1), window=window_buffered))
                     )
 
-                    sharpened = self.sharpen_array(img_array, strength=self.strength)
+                    contains_alpha_band = np.all(
+                        (img_array[-1] == 255) + (img_array[-1] == 0)
+                    )
+
+                    if contains_alpha_band:
+                        sharpened = self.sharpen_array(
+                            img_array[:-1], strength=self.strength
+                        )
+                    else:
+                        sharpened = self.sharpen_array(
+                            img_array, strength=self.strength
+                        )
 
                     # Crop result to original window
                     sharpened = windows_util.crop_array_to_window(
@@ -110,7 +122,10 @@ class RasterSharpener(ProcessingBlock):
                     )
 
                     for i in range(band_count):
-                        dst.write(sharpened[i, ...], i + 1, window=window)
+                        if contains_alpha_band and i == band_count - 1:
+                            dst.write(img_array[i, ...], i + 1, window=window)
+                        else:
+                            dst.write(sharpened[i, ...], i + 1, window=window)
 
     def process(self, input_fc: FeatureCollection) -> FeatureCollection:
         """
@@ -178,4 +193,3 @@ class RasterSharpener(ProcessingBlock):
                 f"Wrong parameter type: {type(strength)} while was expecting str. Passed param: {strength}"
             )
         return RasterSharpener(strength=strength)
-

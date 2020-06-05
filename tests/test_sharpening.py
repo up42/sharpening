@@ -138,6 +138,26 @@ def test_raster_sharpening_expected_pixel_values(
         assert img_array.mean() == expected_mean
 
 
+def test_alpha_band_ignored(tmp_raster_fixture, test_array_fixture):
+    """
+    Checks if alpha band has changed.
+    """
+    in_path, out_path = tmp_raster_fixture
+    params_dict = {"strength": "medium"}
+    img_array = test_array_fixture
+    RasterSharpener().from_dict(params_dict).sharpen_raster(in_path, out_path)
+
+    assert out_path.exists()
+
+    with rio.open(str(out_path), "r") as src:
+        band_count = src.meta["count"]
+        assert band_count == 4
+
+        sharpened = src.read()
+
+        assert np.array_equal(img_array[-1], sharpened[-1])
+
+
 def test_process(tmp_raster_fixture):
     """
     Checks the raster processing for multiple images.
