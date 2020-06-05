@@ -103,7 +103,7 @@ class RasterSharpener(ProcessingBlock):
                         list(src.read(range(1, band_count + 1), window=window_buffered))
                     )
 
-                    alpha_band = np.all((img_array[-1] == 255) + (img_array[-1] == 0))
+                    contains_alpha_band = np.all((img_array[-1] == 255) + (img_array[-1] == 0))
 
                     if alpha_band:
                         sharpened = self.sharpen_array(
