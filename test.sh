@@ -8,7 +8,7 @@ then
   python -m pytest --pylint --pylint-rcfile=../../pylintrc --mypy --mypy-ignore-missing-imports --cov=src/ --runlive
   RET_VALUE=$?
 else
-  python -m pytest --pylint --pylint-rcfile=../../pylintrc --mypy --mypy-ignore-missing-imports --cov=src/
+  python -m pytest --pylint --pylint-rcfile=../../pylintrc --mypy --mypy-ignore-missing-imports --cov=src/ --durations=0
   RET_VALUE=$?
   coverage-badge -f -o coverage.svg
 fi
