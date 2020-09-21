@@ -235,7 +235,8 @@ def test_process_data_path(tmp_raster_fixture):
 
 
 @mock.patch.dict(
-    "os.environ", {"UP42_TASK_PARAMETERS": '{"strength": "light"}'},
+    "os.environ",
+    {"UP42_TASK_PARAMETERS": '{"strength": "light"}'},
 )
 def test_run(tmp_raster_fixture):
     """

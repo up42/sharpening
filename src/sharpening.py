@@ -82,8 +82,9 @@ class RasterSharpener(ProcessingBlock):
         and writes the sharpened array back to the output geotiff raster. If geotiff
         contains alpha band It will be excluded during the sharpening process.
 
-        :param input_file_path: The location of the input file on the file system
-        :param output_file_path: The location of the output file on the file system
+        Args:
+            input_file_path: The location of the input file on the file system
+            output_file_path: The location of the output file on the file system
         """
 
         with rio.open(str(input_file_path), "r") as src:
@@ -133,8 +134,11 @@ class RasterSharpener(ProcessingBlock):
         datasets, runs raster sharpening on each input dataset and creates an output
         feature collection.
 
-        :param metadata: A GeoJSON FeatureCollection describing all input datasets
-        :return: A GeoJSON FeatureCollection describing all output datasets
+        Args:
+            metadata: A GeoJSON FeatureCollection describing all input datasets
+
+        Returns:
+            A GeoJSON FeatureCollection describing all output datasets
         """
         logger.debug("Using sharpening strength: %s", self.strength)
 
@@ -183,8 +187,11 @@ class RasterSharpener(ProcessingBlock):
         """
         Reads the parameters of the processing block from a provided dictionary.
 
-        :param params_dict: The parameters of the sharpening operation
-        :return: Instance of RasterSharpener class configured with the given parameters
+        Args:
+            params_dict: The parameters of the sharpening operation
+
+        Returns:
+            Instance of RasterSharpener class configured with the given parameters
         """
 
         strength: str = kwargs.get("strength", "medium") or "medium"

@@ -14,7 +14,9 @@ from blockutils.common import (
 )  # pylint: disable=wrong-import-position
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
+from blockutils.logging import get_logger
 
+logger = get_logger(__name__)
 
 if __name__ == "__main__":
     TESTNAME = "e2e_sharpening"
@@ -43,13 +45,13 @@ if __name__ == "__main__":
     with open(str(GEOJSON_PATH)) as f:
         FEATURE_COLLECTION = geojson.load(f)
 
-    print(FEATURE_COLLECTION.features[0].bbox)
+    logger.info(FEATURE_COLLECTION.features[0].bbox)
 
     # Check number of files in output_prefix
     OUTPUT_SHARPEN = OUTPUT_DIR / Path(
         FEATURE_COLLECTION.features[0].properties["up42.data_path"]
     )
 
-    print(OUTPUT_SHARPEN)
+    logger.info(OUTPUT_SHARPEN)
 
     assert OUTPUT_SHARPEN.exists()
